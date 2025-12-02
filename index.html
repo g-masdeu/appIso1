@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aplicació de Tasques</title>
+  <script>
+    // Funció per obtenir tasques del backend
+    async function getTasks() {
+      const response = await fetch('/tasks');
+      const tasks = await response.json();
+      const taskList = document.getElementById('task-list');
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.textContent = task.title;
+        taskList.appendChild(li);
+      });
+    }
+
+    // Funció per afegir una nova tasca
+    async function addTask() {
+      const taskInput = document.getElementById('task-input');
+      const taskTitle = taskInput.value;
+
+      if (taskTitle.trim() === '') return;
+
+      const newTask = { title: taskTitle };
+      const response = await fetch('/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTask)
+      });
+
+      if (response.ok) {
+        taskInput.value = '';
+        getTasks(); // Torna a carregar les tasques
+      } else {
+        alert('No s\'ha pogut afegir la tasca.');
+      }
+    }
+
+    window.onload = getTasks;
+  </script>
+</head>
+<body>
+  <h1>Aplicació de Tasques</h1>
+  <input type="text" id="task-input" placeholder="Escriu una tasca...">
+  <button onclick="addTask()">Afegir Tasca</button>
+  <ul id="task-list"></ul>
+</body>
+</html>
